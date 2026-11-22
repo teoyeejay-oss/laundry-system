@@ -1,0 +1,32 @@
+[
+    {
+        "order_id": "O001",
+        "weight": 4,
+        "services": [
+            {
+                "service": "Washing",
+                "charge": 8.0
+            },
+            {
+                "service": "Ironing",
+                "charge": 6.0
+            }
+        ],
+        "total_payment": 14.0
+    },
+    {
+        "order_id": "O002",
+        "weight": 5,
+        "services": [
+            {
+                "service": "Washing",
+                "charge": 10.0
+            },
+            {
+                "service": "Drying",
+                "charge": 5.0
+            }
+        ],
+        "total_payment": 15.0
+    }
+]

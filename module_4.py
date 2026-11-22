@@ -2,6 +2,14 @@ import tkinter as tk
 import json
 import os
 
+# GUI Colour Settings
+BG_COLOR = "#0F172A"
+CARD_COLOR = "#1E293B"
+TEXT_COLOR = "#F8FAFC"
+MUTED_COLOR = "#94A3B8"
+BLUE_COLOR = "#2563EB"
+SUCCESS_COLOR = "#22C55E"
+ERROR_COLOR = "#EF4444"
 
 # ==========================================
 # 1. Payment Calculator - Core Logic
@@ -107,68 +115,104 @@ class PaymentCalculator:
 # 2. Payment Calculator GUI - User Interface
 # ==========================================
 
-class PaymentCalculatorGUI:
-
+class PaymentCalculatorGUI(tk.Frame):
     def __init__(self, root):
+        root.configure(bg=BG_COLOR)
+        super().__init__(root, padx=30, pady=25,  bg=BG_COLOR)
 
         self.root = root
-
         self.root.title("Laundry Service - Payment Calculator")
         self.root.geometry("650x650")
         self.root.resizable(False, False)
+        self.pack(fill="both", expand=True)
 
-        # Connect to PaymentCalculator
+        # Header
+        self.header_frame = tk.Frame(self,bg=BG_COLOR)
+        self.header_frame.pack(fill="x",pady=(0, 25))
+
+        self.title_label = tk.Label(
+        self.header_frame,
+        text="LAUNDRY SERVICE",
+        font=("Arial", 22, "bold"),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+        )
+        self.title_label.pack(anchor="w")
+
+        self.subtitle_label = tk.Label(
+        self.header_frame,
+        text="Payment Management Dashboard",
+        font=("Arial", 10),
+        bg=BG_COLOR,
+        fg=MUTED_COLOR
+        )
+        self.subtitle_label.pack(anchor="w", pady=(5, 0))
+
         self.calculator = PaymentCalculator()
 
-        # Main Frame
-        self.main_frame = tk.Frame(
-            self.root,
-            padx=30,
-            pady=25
+        self.input_frame = tk.Frame(
+        self,
+        bg=CARD_COLOR,
+        padx=20,
+        pady=20
         )
-        self.main_frame.pack(fill="both", expand=True)
-
-        # Title
-        self.title_label = tk.Label(
-            self.main_frame,
-            text="Laundry Service",
-            font=("Arial", 22, "bold")
+        self.input_frame.pack(
+        fill="x",
+        pady=(0, 20)
         )
-        self.title_label.pack(pady=5)
 
-        # Subtitle
-        self.subtitle_label = tk.Label(
-            self.main_frame,
-            text="Payment Calculator",
-            font=("Arial", 13)
+        self.calculator_title = tk.Label(
+        self.input_frame,
+        text="Payment Calculator",
+        font=("Arial", 15, "bold"),
+        bg=CARD_COLOR,
+        fg=TEXT_COLOR
         )
-        self.subtitle_label.pack(pady=5)
 
-        # Input Frame
-        self.input_frame = tk.Frame(self.main_frame)
-        self.input_frame.pack(pady=20)
+        self.calculator_title.pack(anchor="w", pady=(0, 15))
+
+        # Input Area
+        self.input_area = tk.Frame(
+        self.input_frame,
+        bg=CARD_COLOR
+        )
+        self.input_area.pack(fill="x")
 
         # Order ID Label
         self.order_label = tk.Label(
-            self.input_frame,
-            text="Enter Order ID:",
-            font=("Arial", 11)
+        self.input_area,
+        text="Enter Order ID:",
+        font=("Arial", 11),
+        bg=CARD_COLOR,
+        fg=TEXT_COLOR
         )
+
         self.order_label.grid(row=0, column=0, padx=5)
 
         # Order ID Entry
         self.order_entry = tk.Entry(
-            self.input_frame,
+            self.input_area,
             font=("Arial", 11),
-            width=20
+            width=20,
+            bg="#0F172A",
+            fg=TEXT_COLOR,
+            insertbackground=TEXT_COLOR,
+            relief="flat",
+            bd=0,
+            highlightthickness=1,
+            highlightbackground="#475569",
+            highlightcolor=BLUE_COLOR
         )
-        self.order_entry.grid(row=0, column=1, padx=5)
+        self.order_entry.grid(row=0, column=1, padx=5,pady=5,sticky="w")
 
         self.error_label = tk.Label(
-            self.input_frame,
+            self.input_area,
             text="",
             font=("Arial", 9),
             fg="red",
+            bg=CARD_COLOR,
+            bd=0,
+            highlightthickness=0,
             anchor="e"
         )
 
@@ -181,60 +225,111 @@ class PaymentCalculatorGUI:
 
         # Calculate Button
         self.calculate_button = tk.Button(
-            self.main_frame,
+            self,
             text="Calculate Payment",
             font=("Arial", 11, "bold"),
             width=22,
+            bg=BLUE_COLOR,
+            fg=TEXT_COLOR,
+            activebackground="#1D4ED8",
+            activeforeground=TEXT_COLOR,
             command=self.calculate
         )
         self.calculate_button.pack(pady=5)
 
         #Clear button
         self.clear_button = tk.Button(
-            self.main_frame,
+            self,
             text="Clear Result",
             font=("Arial", 11),
             width=22,
+            bg=CARD_COLOR,
+            fg=TEXT_COLOR,
             command=self.clear_result
         )
         self.clear_button.pack(pady=5)
 
-        # View Records Button
-        self.records_button = tk.Button(
-            self.main_frame,
-            text="View Payment Records",
-            font=("Arial", 11),
-            width=22,
-            command=self.view_records
+        # Payment Result Card
+        self.result_frame = tk.Frame(
+        self,
+        bg=CARD_COLOR,
+        padx=20,
+        pady=20
         )
-        self.records_button.pack(pady=5)
+        self.result_frame.pack(
+        fill="x",
+        pady=(0, 20)
+        )
+
+        # Result Title
+        self.result_title = tk.Label(
+        self.result_frame,
+        text="Payment Result",
+        font=("Arial", 15, "bold"),
+        bg=CARD_COLOR,
+        fg=TEXT_COLOR
+        )
+        self.result_title.pack(anchor="w", pady=(0, 15))
 
         # Result Label
         self.result_label = tk.Label(
-            self.main_frame,
-            text="Payment result will appear here.",
-            font=("Arial", 11),
-            justify="left",
-            anchor="w"
+        self.result_frame,
+        text="Payment result will appear here.",
+        font=("Arial", 11),
+        justify="left",
+        anchor="w",
+        bg=CARD_COLOR,
+        fg=TEXT_COLOR
         )
-        self.result_label.pack(pady=15, anchor="w")
+        self.result_label.pack(anchor="w")
+
+        # Payment History Card
+        self.history_frame = tk.Frame(
+        self,
+        bg=CARD_COLOR,
+        padx=20,
+        pady=20 
+        )
+        self.history_frame.pack(fill="x",pady=(0, 20))
 
         # History Title
         self.history_title = tk.Label(
-            self.main_frame,
-            text="Payment Records",
-            font=("Arial", 12, "bold")
+        self.history_frame,
+        text="Payment History",
+        font=("Arial", 15, "bold"),
+        bg=CARD_COLOR,
+        fg=TEXT_COLOR
         )
-        self.history_title.pack(anchor="w", pady=5)
+        self.history_title.pack(anchor="w",pady=(0, 15))
+
+        # View Records Button
+        self.records_button = tk.Button(
+        self.history_frame,
+        text="View Payment Records",
+        font=("Arial", 10, "bold"),
+        bg=BLUE_COLOR,
+        fg=TEXT_COLOR,
+        activebackground="#1D4ED8",
+        activeforeground=TEXT_COLOR,
+        command=self.view_records
+        )
+        self.records_button.pack(anchor="w",pady=(0, 15))
 
         # History Text Area
         self.history_text = tk.Text(
-            self.main_frame,
-            height=10,
-            width=65,
-            font=("Arial", 10)
+        self.history_frame,
+        height=8,
+        width=65,
+        font=("Consolas", 10),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR,
+        insertbackground=TEXT_COLOR,
+        relief="flat",
+        bd=0,
+        padx=10,
+        pady=10
         )
-        self.history_text.pack()
+        self.history_text.pack(fill="x")
 
     # Calculate Button Function
     def calculate(self):
@@ -261,7 +356,7 @@ class PaymentCalculatorGUI:
         except ValueError as error:
             self.error_label.config(text=str(error))
 
-        except KeyError as error:
+        except KeyError:
             self.error_label.config(text="Order ID does not exist.")
 
         else:
