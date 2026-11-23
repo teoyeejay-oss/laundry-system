@@ -37,6 +37,13 @@ class PaymentCalculator:
 
         self.__file_name = "payment_records.json"
 
+    def save_updated_records(self, records):
+        with open(self.__file_name, "w") as file:
+            json.dump(records, file, indent=4)
+
+    def get_service_rate(self, service):
+        return self.__service_rates[service]
+
     # Calculate payment
     def calculate_payment(self, order_id):
 
@@ -122,7 +129,7 @@ class PaymentCalculatorGUI(tk.Frame):
 
         self.root = root
         self.root.title("Laundry Service - Payment Calculator")
-        self.root.geometry("650x650")
+        self.root.geometry("1000x750")
         self.root.resizable(False, False)
         self.pack(fill="both", expand=True)
 
@@ -150,16 +157,34 @@ class PaymentCalculatorGUI(tk.Frame):
 
         self.calculator = PaymentCalculator()
 
+        # Main Area
+        self.main_area = tk.Frame(self,bg=BG_COLOR)
+        self.main_area.pack(fill="both", expand=True)
+
+
+        # Left Column
+        self.left_column = tk.Frame(
+             self.main_area,
+             bg=BG_COLOR
+        )
+        self.left_column.pack(side="left", fill="both", expand=True,padx=(0, 10))
+
+
+        # Right Column
+        self.right_column = tk.Frame(
+             self.main_area,
+             bg=BG_COLOR
+        )
+        self.right_column.pack(side="right", fill="both", expand=True,padx=(10, 0))
+
+        #Calculator Card
         self.input_frame = tk.Frame(
-        self,
+        self.left_column,
         bg=CARD_COLOR,
         padx=20,
         pady=20
         )
-        self.input_frame.pack(
-        fill="x",
-        pady=(0, 20)
-        )
+        self.input_frame.pack(fill="x",pady=(0, 20))
 
         self.calculator_title = tk.Label(
         self.input_frame,
@@ -225,33 +250,35 @@ class PaymentCalculatorGUI(tk.Frame):
 
         # Calculate Button
         self.calculate_button = tk.Button(
-            self,
-            text="Calculate Payment",
-            font=("Arial", 11, "bold"),
-            width=22,
+            self.input_area,
+            text="Calculate",
+            font=("Arial", 10, "bold"),
+            width=13,
             bg=BLUE_COLOR,
             fg=TEXT_COLOR,
             activebackground="#1D4ED8",
             activeforeground=TEXT_COLOR,
             command=self.calculate
         )
-        self.calculate_button.pack(pady=5)
+        self.calculate_button.grid(row=0, column=2, padx=5, pady=5)
 
-        #Clear button
-        self.clear_button = tk.Button(
-            self,
-            text="Clear Result",
-            font=("Arial", 11),
-            width=22,
-            bg=CARD_COLOR,
+        # Search Button
+        self.search_button = tk.Button(
+            self.input_area,
+            text="Search",
+            font=("Arial", 10, "bold"),
+            width=10,
+            bg="#334155",
             fg=TEXT_COLOR,
-            command=self.clear_result
+            activebackground="#475569",
+            activeforeground=TEXT_COLOR,
+            command=self.search_record
         )
-        self.clear_button.pack(pady=5)
+        self.search_button.grid(row=0, column=3, padx=5, pady=5)
 
         # Payment Result Card
         self.result_frame = tk.Frame(
-        self,
+        self.left_column,
         bg=CARD_COLOR,
         padx=20,
         pady=20
@@ -283,14 +310,224 @@ class PaymentCalculatorGUI(tk.Frame):
         )
         self.result_label.pack(anchor="w")
 
+        #Clear button
+        self.clear_button = tk.Button(
+            self.result_frame,
+            text="Clear Result",
+            font=("Arial", 11, "bold"),
+            width=12,
+            bg="#334155",
+            fg=TEXT_COLOR,
+            activebackground="#475569",
+            activeforeground=TEXT_COLOR,
+            command=self.clear_result
+        )
+        self.clear_button.pack(anchor="w", pady=10)
+
         # Payment History Card
         self.history_frame = tk.Frame(
-        self,
+        self.right_column,
         bg=CARD_COLOR,
         padx=20,
         pady=20 
         )
         self.history_frame.pack(fill="x",pady=(0, 20))
+
+        # Update Payment Card
+        self.update_frame = tk.Frame(
+            self.left_column,
+            bg=CARD_COLOR,
+            padx=20,
+            pady=20
+        )
+        self.update_frame.pack(fill="x", pady=(0, 20))
+
+        # Update Payment Title
+        self.update_title = tk.Label(
+            self.update_frame,
+            text="Update Payment",
+            font=("Arial", 14, "bold"),
+            bg=CARD_COLOR,
+            fg=TEXT_COLOR
+        )
+        self.update_title.pack(anchor="w", pady=(0, 5))
+
+        # Update Input Area
+        self.update_input_area = tk.Frame(
+             self.update_frame,
+             bg=CARD_COLOR
+             )
+        self.update_input_area.pack(fill="x")
+
+        # Update Order ID Entry
+        self.update_id_entry = tk.Entry(
+            self.update_input_area,
+            font=("Arial", 11),
+            width=20,
+            bg=BG_COLOR,
+            fg=TEXT_COLOR,
+            insertbackground=TEXT_COLOR,
+            relief="flat",
+            bd=0,
+            highlightthickness=1,
+            highlightbackground="#475569",
+            highlightcolor=BLUE_COLOR
+        )
+        self.update_id_entry.grid(row=0, column=0, padx=5, pady=5)
+
+        # Update Button
+        self.update_button = tk.Button(
+            self.update_input_area,
+            text="Update",
+            font=("Arial", 10, "bold"),
+            width=13,
+            bg=BLUE_COLOR,
+            fg=TEXT_COLOR,
+            activebackground="#1D4ED8",
+            activeforeground=TEXT_COLOR,
+            command=self.search_update_record
+        )
+        self.update_button.grid(row=0, column=1, padx=5, pady=5)
+
+
+        # Update Error Label
+        self.update_error_label = tk.Label(
+            self.update_frame,
+            text="",
+            font=("Arial", 9),
+            bg=CARD_COLOR,
+            fg=ERROR_COLOR
+        )
+        self.update_error_label.pack(anchor="w", padx=5, pady=5)
+
+        # Edit Payment Details Frame
+        self.edit_frame = tk.Frame(
+            self.update_frame,
+            bg=CARD_COLOR,
+            padx=5,
+            pady=10
+        )
+
+        # Edit Payment Details Title
+        self.edit_title = tk.Label(
+            self.edit_frame,
+            text="Edit Payment Details",
+            font=("Arial", 12, "bold"),
+            bg=CARD_COLOR,
+            fg=TEXT_COLOR
+        )
+        self.edit_title.pack(anchor="w", pady=(5, 10))
+
+        # Weight Input Area
+        self.weight_area = tk.Frame(
+             self.edit_frame,
+             bg=CARD_COLOR
+             )
+        self.weight_area.pack(fill="x", pady=5)
+
+
+        # Weight Label
+        self.weight_label = tk.Label(
+             self.weight_area,
+             text="Weight (kg)",
+             font=("Arial", 11),
+             bg=CARD_COLOR,
+             fg=TEXT_COLOR
+        )
+        self.weight_label.grid(row=0, column=0, padx=5, pady=5)
+
+
+        # Weight Entry
+        self.weight_entry = tk.Entry(
+             self.weight_area,
+             font=("Arial", 11),
+             width=10,
+             bg=BG_COLOR,
+             fg=TEXT_COLOR,
+             insertbackground=TEXT_COLOR,
+             relief="flat",
+             bd=0
+        )
+        self.weight_entry.grid(row=0, column=1, padx=10, pady=5)
+
+
+        # Services Area
+        self.services_area = tk.Frame(
+             self.edit_frame,
+             bg=CARD_COLOR
+        )
+        self.services_area.pack(fill="x", pady=10)
+
+
+        # Services Title
+        self.services_title = tk.Label(
+             self.services_area,
+             text="Services",
+             font=("Arial", 11, "bold"),
+             bg=CARD_COLOR,
+             fg=TEXT_COLOR
+        )
+        self.services_title.pack(anchor="w", padx=5, pady=5)
+
+        self.washing_var = tk.BooleanVar(value=False)
+        self.drying_var = tk.BooleanVar(value=False)
+        self.ironing_var = tk.BooleanVar(value=False)
+
+        # Washing Checkbutton
+        self.washing_check = tk.Checkbutton(
+             self.services_area,
+             text="Washing",
+             variable=self.washing_var,
+             font=("Arial", 10),
+             bg=CARD_COLOR,
+             fg=TEXT_COLOR,
+             selectcolor=BG_COLOR,
+             activebackground=CARD_COLOR,
+             activeforeground=TEXT_COLOR
+        )
+        self.washing_check.pack(anchor="w", padx=10, pady=2)
+
+        self.drying_check = tk.Checkbutton(
+                     self.services_area,
+                     text="Drying",
+                     variable=self.drying_var,
+                     font=("Arial", 10),
+                     bg=CARD_COLOR,
+                     fg=TEXT_COLOR,
+                     selectcolor=BG_COLOR,
+                     activebackground=CARD_COLOR,
+                     activeforeground=TEXT_COLOR
+                )
+        self.drying_check.pack(anchor="w", padx=10, pady=2)
+
+        self.ironing_check = tk.Checkbutton(
+                     self.services_area,
+                     text="Ironing",
+                     variable=self.ironing_var,
+                     font=("Arial", 10),
+                     bg=CARD_COLOR,
+                     fg=TEXT_COLOR,
+                     selectcolor=BG_COLOR,
+                     activebackground=CARD_COLOR,
+                     activeforeground=TEXT_COLOR
+                )
+        self.ironing_check.pack(anchor="w", padx=10, pady=2)
+
+        # Save Changes Button
+        self.save_changes_button = tk.Button(
+             self.edit_frame,
+             text="Save Changes",
+             font=("Arial", 10, "bold"),
+             width=15,
+             bg=BLUE_COLOR,
+             fg=TEXT_COLOR,
+             activebackground="#1D4ED8",
+             activeforeground=TEXT_COLOR,
+             command=self.save_updated_record
+        )
+        self.save_changes_button.pack(anchor="w", pady=10)
+
+
 
         # History Title
         self.history_title = tk.Label(
@@ -331,6 +568,24 @@ class PaymentCalculatorGUI(tk.Frame):
         )
         self.history_text.pack(fill="x")
 
+        # Automatically fit window width to GUI content
+        self.root.update_idletasks()
+        self.root.geometry(f"{self.root.winfo_reqwidth()}x650")
+
+        # Center window on screen
+        self.root.update_idletasks()
+
+        window_width = self.root.winfo_width()
+        window_height = self.root.winfo_height()
+
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+
+        self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        
     # Calculate Button Function
     def calculate(self):
 
@@ -447,6 +702,152 @@ class PaymentCalculatorGUI(tk.Frame):
         self.result_label.config(
         text="Payment result will appear here."
     )
+    #Search record function
+    def search_record(self):
+
+        # Get Order ID
+        order_id = self.order_entry.get().strip().upper()
+
+        # Load payment records
+        records = self.calculator.load_payment_records()
+
+        # Search records
+        for record in records:
+          if record.get("order_id") == order_id:
+            self.display_record(record)
+            self.order_entry.delete(0, tk.END)
+            return
+
+        # Record not found
+        self.error_label.config(text="Record not found.")
+
+    def display_record(self, record):
+        order_id = record.get("order_id")
+        weight = record.get("weight")
+        total = record.get("total_payment")
+        services = record.get("services")
+        service_text = ""
+
+        for service in services:
+            name = service.get("service")
+            charge = service.get("charge")
+            service_text += f"{name}: RM{charge:.2f}\n"
+
+        result = (  
+            f"Order ID: {order_id}\n"
+            f"Weight: {weight} kg\n"
+            f"{service_text}"
+            f"Total Payment: RM{total:.2f}"
+        )
+
+        self.result_label.config(text=result)
+        self.error_label.config(text="")
+
+    def search_update_record(self):
+        self.edit_frame.pack_forget()
+        # Get Order ID
+        order_id = self.update_id_entry.get().strip().upper()
+
+        # Load Existing Payment Records
+        records = self.calculator.load_payment_records()
+
+        # Search Record
+        for record in records:
+            if record.get("order_id") == order_id:
+                # Record Found
+                self.update_error_label.config(text="")
+                self.edit_frame.pack(fill="x")
+
+                # Fill Existing Weight
+                self.weight_entry.delete(0, tk.END)
+                self.weight_entry.insert(0, record["weight"])
+
+                self.washing_var.set(any(item["service"] == "Washing" for item in record["services"]))
+                self.drying_var.set( any(item["service"] == "Drying" for item in record["services"]))
+                self.ironing_var.set( any(item["service"] == "Ironing" for item in record["services"]))
+                return
+
+        # Record Not Found
+        self.update_error_label.config(text="Record not found.", fg=ERROR_COLOR)
+
+    def save_updated_record(self):
+        # Get Updated Weight
+        weight = self.weight_entry.get()
+
+        # Get Selected Services
+        services = []
+
+        if self.washing_var.get():
+            services.append("Washing")
+
+        if self.drying_var.get():
+            services.append("Drying")
+
+        if self.ironing_var.get():
+            services.append("Ironing")
+
+        # Validate Weight
+        try:
+            weight = float(weight)
+
+            if weight <= 0:
+                raise ValueError("Weight must be greater than 0.")
+
+        except ValueError:
+            self.update_error_label.config(text="Invalid weight.")
+            return
+
+        # Validate Services
+        if not services:
+            self.update_error_label.config(
+                text="Please select at least one service."
+            )
+            return
+
+        # Recalculate Payment
+        total_amount = 0
+        service_charges = []
+
+        for service in services:
+            # Get Service Rate
+            rate = self.calculator.get_service_rate(service)
+
+            # Calculate Individual Charge
+            charge = weight * rate
+
+            # Add to Total
+            total_amount += charge
+
+            # Store Service Details
+            service_charges.append({
+                "service": service,
+                "charge": charge
+        })
+        order_id = self.update_id_entry.get().strip().upper()
+        records = self.calculator.load_payment_records()
+
+        for record in records:
+            if record["order_id"] == order_id:
+                # Update this record
+                record["weight"] = weight
+                record["services"] = service_charges
+                record["total_payment"] = total_amount
+
+                # Save Updated Records
+                self.calculator.save_updated_records(records)
+
+                # Update GUI
+                self.update_error_label.config(text="")
+
+                self.display_record(record)
+                self.view_records()
+
+                self.update_error_label.config(
+                    text="Payment record updated successfully.",
+                    fg=SUCCESS_COLOR
+                )
+
+                break
 
 
 # ==========================================
