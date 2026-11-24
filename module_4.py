@@ -107,10 +107,15 @@ class PaymentCalculator:
 
         records = self.load_payment_records()
 
-        for existing_record in records:
+        index = 0
 
-            if existing_record.get("order_id") == record["order_id"]:
-                raise ValueError("Payment record already exists.")
+        while index < len(records):
+            existing_record = records[index]
+
+        if existing_record.get("order_id") == record["order_id"]:
+            raise ValueError("Payment record already exists.")
+
+        index += 1
 
         records.append(record)
 
@@ -130,7 +135,7 @@ class PaymentCalculatorGUI(tk.Frame):
         self.root = root
         self.root.title("Laundry Service - Payment Calculator")
         self.root.geometry("1000x750")
-        self.root.resizable(True, True)
+        self.root.resizable(False, False)
         self.pack(fill="both", expand=True)
 
         # Header
@@ -326,7 +331,7 @@ class PaymentCalculatorGUI(tk.Frame):
 
         # Payment History Card
         self.history_frame = tk.Frame(
-        self.left_column,
+        self.right_column,
         bg=CARD_COLOR,
         padx=20,
         pady=20 
@@ -335,7 +340,7 @@ class PaymentCalculatorGUI(tk.Frame):
 
         # Update Payment Card
         self.update_frame = tk.Frame(
-            self.right_column,
+            self.left_column,
             bg=CARD_COLOR,
             padx=20,
             pady=20
@@ -709,7 +714,12 @@ class PaymentCalculatorGUI(tk.Frame):
         order_id = self.order_entry.get().strip().upper()
 
         # Load payment records
-        records = self.calculator.load_payment_records()
+        try:
+            records = self.calculator.load_payment_records()
+
+        except ValueError as error:
+            self.error_label.config(text=str(error))
+            return
 
         # Search records
         for record in records:
@@ -749,7 +759,12 @@ class PaymentCalculatorGUI(tk.Frame):
         order_id = self.update_id_entry.get().strip().upper()
 
         # Load Existing Payment Records
-        records = self.calculator.load_payment_records()
+        try:
+            records = self.calculator.load_payment_records()
+
+        except ValueError as error:
+            self.update_error_label.config(text=str(error))
+            return
 
         # Search Record
         for record in records:
@@ -824,8 +839,13 @@ class PaymentCalculatorGUI(tk.Frame):
                 "charge": charge
         })
         order_id = self.update_id_entry.get().strip().upper()
-        records = self.calculator.load_payment_records()
+        try:
+            records = self.calculator.load_payment_records()
 
+        except ValueError as error:
+            self.update_error_label.config(text=str(error),fg=ERROR_COLOR)
+            return
+        
         for record in records:
             if record["order_id"] == order_id:
                 # Update this record
@@ -834,7 +854,12 @@ class PaymentCalculatorGUI(tk.Frame):
                 record["total_payment"] = total_amount
 
                 # Save Updated Records
-                self.calculator.save_updated_records(records)
+                try:
+                    self.calculator.save_updated_records(records)
+
+                except OSError as error:
+                    self.update_error_label.config(text=str(error), fg=ERROR_COLOR)
+                    return
 
                 # Update GUI
                 self.update_error_label.config(text="")
