@@ -112,10 +112,10 @@ class PaymentCalculator:
         while index < len(records):
             existing_record = records[index]
 
-        if existing_record.get("order_id") == record["order_id"]:
-            raise ValueError("Payment record already exists.")
+            if existing_record.get("order_id") == record["order_id"]:
+                raise ValueError("Payment record already exists.")
 
-        index += 1
+            index += 1
 
         records.append(record)
 
