@@ -135,7 +135,7 @@ class PaymentCalculatorGUI(tk.Frame):
         self.root = root
         self.root.title("Laundry Service - Payment Calculator")
         self.root.geometry("1000x750")
-        self.root.resizable(False, False)
+        self.root.resizable(True, True)
         self.pack(fill="both", expand=True)
 
         # Header
@@ -331,7 +331,7 @@ class PaymentCalculatorGUI(tk.Frame):
 
         # Payment History Card
         self.history_frame = tk.Frame(
-        self.right_column,
+        self.left_column,
         bg=CARD_COLOR,
         padx=20,
         pady=20 
@@ -340,7 +340,7 @@ class PaymentCalculatorGUI(tk.Frame):
 
         # Update Payment Card
         self.update_frame = tk.Frame(
-            self.left_column,
+            self.right_column,
             bg=CARD_COLOR,
             padx=20,
             pady=20
